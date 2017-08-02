@@ -119,13 +119,45 @@ $(document).ready(function () {
 </div>
 
 
-<p>getting-and-cleaning-data-assignment By Sen Introduction The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis. You will be graded by your peers on a series of yes/no questions related to the project. You will be required to submit: 1) a tidy data set as described below, 2) a link to a Github repository with your script for performing the analysis, and 3) a code book that describes the variables, the data, and any transformations or work that you performed to clean up the data called CodeBook.md. You should also include a README.md in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.</p>
+<div id="getting-and-cleaning-data-assignment" class="section level1">
+<h1>getting-and-cleaning-data-assignment</h1>
+</div>
+<div id="by-sen" class="section level1">
+<h1>By Sen</h1>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis. You will be graded by your peers on a series of yes/no questions related to the project. You will be required to submit: 1) a tidy data set as described below, 2) a link to a Github repository with your script for performing the analysis, and 3) a code book that describes the variables, the data, and any transformations or work that you performed to clean up the data called CodeBook.md. You should also include a README.md in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.</p>
 <p>One of the most exciting areas in all of data science right now is wearable computing - see for example this article . Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained:</p>
 <p><a href="http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones" class="uri">http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones</a></p>
 <p>Here are the data for the project:</p>
 <p><a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a></p>
-<p>You should create one R script called run_analysis.R that does the following 5 steps:</p>
-<p>Part 1 Merges the training and the test sets to create one data set. ##preparation #data downloading if (!file.exists(“./data”)){ dir.create(“./data”) } fileUrl=“<a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a>” download.file(fileUrl, destfile = “./data/rundata.zip”,method = “curl” ) unzip(“./data/rundata.zip”, exdir = “./data/”) setwd(“./data/”) #features and data reading features &lt;- read.table(“./UCI HAR Dataset/features.txt”, header = F,stringsAsFactors=FALSE) #check structure str(features) test.data&lt;-read.table(“./UCI HAR Dataset/test/X_test.txt”, header = F) test.labels&lt;-read.table(“./UCI HAR Dataset/test/y_test.txt”,col.names=“label”) test.subjects &lt;- read.table(“./UCI HAR Dataset/test/subject_test.txt”, col.names=“subject”) training.data&lt;-read.table(“./UCI HAR Dataset/train/X_train.txt”,header = F) training.labels &lt;- read.table(“./UCI HAR Dataset/train/y_train.txt”, col.names=“label”) training.subjects &lt;- read.table(“./UCI HAR Dataset/train/subject_train.txt”, col.names=“subject”)</p>
+</div>
+<div id="preparation-and-data-downloading" class="section level1">
+<h1>Preparation and data downloading</h1>
+<p>if (!file.exists(“./data”)){ dir.create(“./data”) } fileUrl=“<a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a>” download.file(fileUrl, destfile = “./data/rundata.zip”,method = “curl” ) unzip(“./data/rundata.zip”, exdir = “./data/”) setwd(“./data/”)</p>
+<p>features and data reading</p>
+<p>features &lt;- read.table(“./UCI HAR Dataset/features.txt”, header = F,stringsAsFactors=FALSE) test.data&lt;-read.table(“./UCI HAR Dataset/test/X_test.txt”, header = F) test.labels&lt;-read.table(“./UCI HAR Dataset/test/y_test.txt”,col.names=“label”) test.subjects &lt;- read.table(“./UCI HAR Dataset/test/subject_test.txt”, col.names=“subject”) training.data&lt;-read.table(“./UCI HAR Dataset/train/X_train.txt”,header = F) training.labels &lt;- read.table(“./UCI HAR Dataset/train/y_train.txt”, col.names=“label”) training.subjects &lt;- read.table(“./UCI HAR Dataset/train/subject_train.txt”, col.names=“subject”) #Step1. Merges the training and the test sets to create one data set.</p>
+<p>adding variable names colnames(test.data)&lt;- features[,2] colnames(training.data)&lt;- features[,2]</p>
+<p>assembling and merging test and training data set merge.data &lt;- rbind(cbind(test.subjects, test.labels, test.data), cbind(training.subjects, training.labels, training.data))</p>
+</div>
+<div id="step2.-extracts-only-the-measurements-on-the-mean-and-standard-deviation-for-each-measurement." class="section level1">
+<h1>Step2. Extracts only the measurements on the mean and standard deviation for each measurement.</h1>
+<p>grep features of mean and standard deviation, be careful only grep mean or std followed by () features.mean.std &lt;- features[grep(“mean\(\)|std\(\)”, features$V2), ]</p>
+<p>Add 2 columns because first two columns from merge.data are subjects and labels data.mean.std&lt;-merge.data[,c(1,2,features.mean.std$V1+2)]</p>
+</div>
+<div id="step3.-uses-descriptive-activity-names-to-name-the-activities-in-the-data-set" class="section level1">
+<h1>Step3. Uses descriptive activity names to name the activities in the data set</h1>
+<p>labels&lt;-read.table(“./UCI HAR Dataset/activity_labels.txt”, header = F) data.mean.std<span class="math inline">\(label&lt;-labels[data.mean.std\)</span>label, 2]</p>
+</div>
+<div id="step4.-appropriately-labels-the-data-set-with-descriptive-variable-names." class="section level1">
+<h1>Step4. Appropriately labels the data set with descriptive variable names.</h1>
+<p>create new column name vector tidy.names&lt;-c(“subject”,“label”,features.mean.std$V2) #remove non-alphabetic characters tidy.names&lt;-gsub(“[^[:alpha:]]”, “”, tidy.names) #replace abbreviative letter in the beginning of the variables tidy.names &lt;- gsub(“<sup>f“,”Frequency“, tidy.names) tidy.names &lt;- gsub(”</sup>t”, “Time”, tidy.names) colnames(data.mean.std)&lt;-tidy.names</p>
+</div>
+<div id="step5.creates-a-second-independent-tidy-data-set-with" class="section level1">
+<h1>Step5.Creates a second, independent tidy data set with</h1>
+<p>the average of each variable for each activity and each subject. library(plyr) newdata&lt;- ddply(data.mean.std, c(“subject”,“label”),numcolwise(mean)) write.table(newdata, file = “newdata.txt”)</p>
+</div>
 
 
 
