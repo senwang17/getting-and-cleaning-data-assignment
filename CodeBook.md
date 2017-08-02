@@ -68,3 +68,14 @@ the average of each variable for each activity and each subject.
 library(plyr)
 newdata<- ddply(data.mean.std, c("subject","label"),numcolwise(mean))
 write.table(newdata, file = "newdata.txt")
+
+Subject column is numbered sequentially from 1 to 30. Activity column has 6 types as listed below assigned with a numeric activity id.
+
+   1. WALKING
+   2. WALKING_UPSTAIRS
+   3. WALKING_DOWNSTAIRS
+   4. SITTING
+   5. STANDING
+   6. LAYING
+
+Other variables are detailed in features_info.txt along with the dataset.
